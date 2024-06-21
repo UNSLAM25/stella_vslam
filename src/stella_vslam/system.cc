@@ -288,6 +288,34 @@ void system::enable_temporal_mapping() {
     map_db_->set_fixed_keyframe_id_threshold();
 }
 
+// /!\ UNSLAM25 TODO: Document this method
+data::frame system::create_monocular_frame_from_orb(const cv::Mat& descriptors, const std::vector<cv::KeyPoint> &keypoints, const double timestamp) {
+    data::frame_observation frm_obs;
+    frm_obs.descriptors_ = descriptors;
+    keypts_ = keypoints;
+
+    // Undistort keypoints
+    camera_->undistort_keypoints(keypts_, frm_obs.undist_keypts_);
+
+    // Convert to bearing vector
+    camera_->convert_keypoints_to_bearings(frm_obs.undist_keypts_, frm_obs.bearings_);
+
+    // Assign all the keypoints into grid
+    frm_obs.num_grid_cols_ = num_grid_cols_;
+    frm_obs.num_grid_rows_ = num_grid_rows_;
+    data::assign_keypoints_to_grid(camera_, frm_obs.undist_keypts_, frm_obs.keypt_indices_in_cells_,
+                                   frm_obs.num_grid_cols_, frm_obs.num_grid_rows_);
+
+    // Detect marker
+    std::unordered_map<unsigned int, data::marker2d> markers_2d;
+    if (marker_detector_) {
+        // TODO: we don't have access to img_gray anymore here...
+        // marker_detector_->detect(img_gray, markers_2d);
+    }
+
+    return data::frame(next_frame_id_++, timestamp, camera_, orb_params_, frm_obs, std::move(markers_2d));
+}
+
 data::frame system::create_monocular_frame(const cv::Mat& img, const double timestamp, const cv::Mat& mask) {
     // color conversion
     if (!camera_->is_valid_shape(img)) {
@@ -450,6 +478,22 @@ data::frame system::create_RGBD_frame(const cv::Mat& rgb_img, const cv::Mat& dep
     }
 
     return data::frame(next_frame_id_++, timestamp, camera_, orb_params_, frm_obs, std::move(markers_2d));
+}
+
+// /!\ UNSLAM25 TODO: Document this method
+std::shared_ptr<Mat44_t> system::feed_monocular_frame_from_orb(const cv::Mat& descriptors, const std::vector<cv::KeyPoint> &keypoints, const double timestamp) {
+    check_reset_request();
+    assert(camera_->setup_type_ == camera::setup_type_t::Monocular);
+    if (descriptors.empty() && !keypoints.size()) {
+        spdlog::warn("preprocess: empty image");
+        return nullptr;
+    }
+
+    const auto start = std::chrono::system_clock::now();
+    auto frm = create_monocular_frame_from_orb(descriptors, keypoints, timestamp);
+    const auto end = std::chrono::system_clock::now();
+    double extraction_time_elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    return feed_frame(frm, cv::Mat(), extraction_time_elapsed_ms);
 }
 
 std::shared_ptr<Mat44_t> system::feed_monocular_frame(const cv::Mat& img, const double timestamp, const cv::Mat& mask) {

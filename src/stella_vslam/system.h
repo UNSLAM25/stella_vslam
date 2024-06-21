@@ -144,6 +144,11 @@ public:
     data::frame create_RGBD_frame(const cv::Mat& rgb_img, const cv::Mat& depthmap, const double timestamp, const cv::Mat& mask);
     std::shared_ptr<Mat44_t> feed_RGBD_frame(const cv::Mat& rgb_img, const cv::Mat& depthmap, const double timestamp, const cv::Mat& mask = cv::Mat{});
 
+    // /!\ UNSLAM25 TODO: Document this method
+    //! Feed a monocular frame to SLAM system from ORB
+    //! (NOTE: distorted images are acceptable if calibrated)
+    data::frame create_monocular_frame_from_orb(const cv::Mat& descriptors, const std::vector<cv::KeyPoint> &keypoints, const double timestamp);
+    std::shared_ptr<Mat44_t> feed_monocular_frame_from_orb(const cv::Mat& descriptors, const std::vector<cv::KeyPoint> &keypoints, const double timestamp);
     //-----------------------------------------
     // pose initializing/updating
 
