@@ -27,6 +27,51 @@ void orb_extractor::extract(const cv::_InputArray& in_image, const cv::_InputArr
         return;
     }
 
+    // /!\ UNSLAM25 TODO: Document this 
+    // Code not part of the original stella_vslam
+    if(in_image.cols() <= 200) {
+        // orb from preprocessed image
+        // in_image is a Mat, each row has a concatenation of a 256 bit descriptor 
+        // descriptors = 32 cols, each descriptor is uint8
+        // and 4 values for a keypoint, 2 of 16 bits (4 bytes), and 2 of 8 bits (2 bytes)
+        // total uint8 columns: 32 + 4 + 2 = 38        
+        int DESCRIPTOR_RANGE = 32;
+        int KEYPOINT_RANGE = 38;
+        unsigned int howManyFeatures = in_image.rows();
+ 
+        keypts.clear();
+        keypts.reserve(howManyFeatures);
+
+        // Copy descriptors
+        out_descriptors.create(howManyFeatures, DESCRIPTOR_RANGE, CV_8UC1);
+        cv::Mat outMat = out_descriptors.getMat();
+
+        in_image.getMat().colRange(0, DESCRIPTOR_RANGE).copyTo(outMat);
+
+        // Unwrap keypoints        
+        cv::Mat wrappedKeypoints = in_image.getMat().colRange(DESCRIPTOR_RANGE, KEYPOINT_RANGE).clone();
+
+        int n = 1;
+        bool isLittleEndian = *(char *)&n == 1;
+
+        for(unsigned int row = 0; row < howManyFeatures; row++) {        
+            const unsigned char* values = wrappedKeypoints.ptr<unsigned char>(row);
+            // KeyPoint constructor
+            // https://docs.opencv.org/4.6.0/d2/d29/classcv_1_1KeyPoint.html#a9d81b57ae182dcb3ceac86a6b0211e94
+            keypts.emplace_back(cv::KeyPoint(
+                isLittleEndian ? values[1] << 8 | values[0] : values[0] << 8 | values[1],   // x (short int)
+                isLittleEndian ? values[3] << 8 | values[2] : values[2] << 8 | values[3],   // y (short int)
+                1.0, // size
+                values[4] * 360.0 / 255.0,   // angle (unsigned char)
+                0.0, // response
+                values[5]   // octave (unsigned char)
+            ));
+        }
+
+        return;
+    }
+    // Code not part of original stella_vslam
+
     // get cv::Mat of image
     const auto image = in_image.getMat();
     assert(image.type() == CV_8UC1);

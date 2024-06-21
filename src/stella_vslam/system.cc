@@ -504,10 +504,24 @@ std::shared_ptr<Mat44_t> system::feed_monocular_frame(const cv::Mat& img, const 
         spdlog::warn("preprocess: empty image");
         return nullptr;
     }
+
     const auto start = std::chrono::system_clock::now();
     auto frm = create_monocular_frame(img, timestamp, mask);
     const auto end = std::chrono::system_clock::now();
     double extraction_time_elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    // /!\ UNSLAM25 TODO: Document this 
+    // Code not part of original stella_vslam
+    if (img.cols < 200)
+    {
+        // Create a black image  
+        cv::Mat input = cv::Mat();
+        input.create(camera_->rows_, camera_->cols_, CV_8UC1);
+        input.setTo(cv::Scalar::all(0));        
+        return feed_frame(frm, input, extraction_time_elapsed_ms);
+    }
+    // Code not part of original stella_vslam
+
     return feed_frame(frm, img, extraction_time_elapsed_ms);
 }
 
