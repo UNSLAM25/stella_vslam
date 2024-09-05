@@ -51,7 +51,8 @@ RUN set -x && \
     libyaml-cpp-dev \
     sqlite3 \
     libsqlite3-dev \
-    rsync && \
+    rsync \
+    python3-pip  && \
   : "remove cache" && \
   apt-get autoremove -y -qq && \
   rm -rf /var/lib/apt/lists/*
@@ -116,7 +117,7 @@ RUN set -x && \
   rm -rf *
 ENV g2o_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/g2o
 
-# OpenCV
+# OpenCV, needed to add DOPENCV_GENERATE_PKGCONFIG=ON so make file of python bindings recognizes it
 ARG OPENCV_VERSION=4.7.0
 WORKDIR /tmp
 RUN set -x && \
@@ -146,6 +147,7 @@ RUN set -x && \
     -DWITH_FFMPEG=ON \
     -DWITH_TBB=ON \
     -DWITH_OPENMP=ON \
+    -DOPENCV_GENERATE_PKGCONFIG=ON \
     .. && \
   make -j${NUM_THREADS} && \
   make install && \
@@ -238,5 +240,12 @@ RUN set -x && \
     .. && \
   make -j${NUM_THREADS}
 
-WORKDIR /stella_vslam_examples/build/
+
+# Install pybind11 and numpy, compile python bindings
+RUN pip3 install pybind11 numpy websockets
+WORKDIR /stella_vslam/StellaVSLAM-Python-bindings/
+RUN make
+RUN cp *.so ../vslam-backend/lib/
+
+WORKDIR /stella_vslam/vslam-backend/
 ENTRYPOINT ["/bin/bash"]

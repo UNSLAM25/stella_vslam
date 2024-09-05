@@ -4,3 +4,9 @@
 [submodule "3rd/tinycolormap"]
 	path = 3rd/tinycolormap
 	url = https://github.com/yuki-koyama/tinycolormap.git
+[submodule "StellaVSLAM-Python-bindings"]
+	path = StellaVSLAM-Python-bindings
+	url = https://github.com/Squiro/StellaVSLAM-Python-bindings
+[submodule "vslam-backend"]
+	path = vslam-backend
+	url = https://github.com/UNSLAM25/vslam-backend
