@@ -248,4 +248,4 @@ RUN make
 RUN cp *.so ../vslam-backend/lib/
 
 WORKDIR /stella_vslam/vslam-backend/
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/bash", "-c", "python3 completeSystem.py"]
