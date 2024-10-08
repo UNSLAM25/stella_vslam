@@ -8,6 +8,8 @@
 
 ## Linux / Ubuntu
 
+    Note: please make sure you are not running docker through snapd. Otherwise you won't be able to connect to the instance with xhost.
+
 1. Run ```sudo docker build -t unslam -f Dockerfile.iridescence . --build-arg NUM_THREADS=`expr $(nproc) - 1` ``` to build
 1. Run ```xhost +local:``` to be able to see the GUI
 1. Open a terminal on this project's root folder, then run the following command: ```sudo docker run -it --rm --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix:ro -v $PWD/vslam-backend:/stella_vslam/vslam-backend unslam``` to execute
