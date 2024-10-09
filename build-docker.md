@@ -12,7 +12,7 @@
 
 1. Run ```sudo docker build -t unslam -f Dockerfile.iridescence . --build-arg NUM_THREADS=`expr $(nproc) - 1` ``` to build
 1. Run ```xhost +local:``` to be able to see the GUI
-1. Open a terminal on this project's root folder, then run the following command: ```sudo docker run -it --rm --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix:ro -v $PWD/vslam-backend:/stella_vslam/vslam-backend unslam``` to execute
+1. Open a terminal on this project's root folder, then run the following command: ```sudo docker run -it --rm --privileged --name unslam-cont -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix:ro -v <PATH_TO_YOUR_CONFIG_FILE>:/stella_vslam/vslam-backend/config.yaml unslam``` to execute
 
 ## Windows 
 
@@ -30,7 +30,7 @@
 
 1.  ```docker build -t unslam -f Dockerfile.iridescence . --build-arg NUM_THREADS=`<YOUR_NUMBER_OF_THREADS>` ```
 1. Find your computer IP address using ```ipconfig```
-1. Open a Powershell terminal on this project's root folder, then run the following command, replacing the values where needed: ```docker run -it --rm --privileged -p 8000:8000 -p 8765:8765 -e DISPLAY=<YOUR_IP_ADDRESS>:0.0 -v /c/Users/<YOUR_WINDOWS_USER>:/tmp/.X11-unix:ro -v $pwd/vslam-backend:/stella_vslam/vslam-backend unslam``` 
+1. Open a Powershell terminal on this project's root folder, then run the following command, replacing the values where needed: ```docker run -it --rm --privileged --name unslam-cont -p 8000:8000 -p 8765:8765 -e DISPLAY=<YOUR_IP_ADDRESS>:0.0 -v <PATH_TO_YOUR_CONFIG_FILE>:/stella_vslam/vslam-backend/config.yaml unslam``` 
 
 
 ## Running UNSLAM
