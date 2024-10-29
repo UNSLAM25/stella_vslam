@@ -197,13 +197,13 @@ public:
     double depthmap_factor_ = 1.0;
 
     //-----------------------------------------
-    // UNSLAM25
+    // UNSLAM25, Analysis
     data::frame_observation* get_currentframe_observation(){
         return &tracker_->curr_frame_.frm_obs_
     }
 
-
-private:
+// Analysis branch, free access to attributes, for future analysis
+//private:
     //! Check reset request of the system
     void check_reset_request();
 
