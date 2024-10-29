@@ -30,6 +30,7 @@ class camera_database;
 class orb_params_database;
 class map_database;
 class bow_database;
+class frame_observation;    // UNSLAM added
 } // namespace data
 
 namespace feature {
@@ -194,6 +195,13 @@ public:
 
     //! depthmap factor (pixel_value / depthmap_factor = true_depth)
     double depthmap_factor_ = 1.0;
+
+    //-----------------------------------------
+    // UNSLAM25
+    data::frame_observation* get_currentframe_observation(){
+        return &tracker_->curr_frame_.frm_obs_
+    }
+
 
 private:
     //! Check reset request of the system
