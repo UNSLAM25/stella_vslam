@@ -20,6 +20,7 @@ The code changes required to receive the image descriptor from the hybrid UNSLAM
 
 The hybrid system delivers an image descriptor to the Visual Slam system like an image - a matrix, through the same pipeline. The code modifications measure the width of the matrix: if it has up to 200 columns it is assumed to be an image descriptor and uses the new code to process it; if it has more than 200 columns it is assumed to be an image and follows the original pipeline.
 
+This repository includes UNSLAM' submodules and instructions to [build a Docker image](build-docker.md) for the complete UNSLAM hybrid VSLAM project.
 
 
 ---
