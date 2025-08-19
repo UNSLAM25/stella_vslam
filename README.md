@@ -1,14 +1,26 @@
 # stella_vslam
 
-[![CI](https://github.com/stella-cv/stella_vslam/actions/workflows/main.yml/badge.svg)](https://github.com/stella-cv/stella_vslam/actions/workflows/main.yml)
-[![Documentation Status](https://readthedocs.org/projects/stella-cv/badge/?version=latest)](https://stella-cv.readthedocs.io/en/latest/?badge=latest)
 [![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
 ---
 
-> *NOTE:* This is a community fork of [xdspacelab/openvslam](https://github.com/xdspacelab/openvslam). It was created to continue active development of OpenVSLAM on Jan 31, 2021. The original repository is no longer available. Please read the [official statement of termination](https://github.com/xdspacelab/openvslam/wiki/Termination-of-the-release) carefully and understand it before using this. The similarities with ORB_SLAM2 in the original version have been removed by [#252](https://github.com/stella-cv/stella_vslam/pull/252). If you find any other issues with the license, please point them out. See [#37](https://github.com/stella-cv/stella_vslam/issues/37) and [#249](https://github.com/stella-cv/stella_vslam/issues/249) for discussion so far.
+Stella VSLAM is the Visual SLAM system adopted by UNSLAM.  It’s open source, derived from OpenVSLAM, a rewrite of ORB-SLAM2 based on its paper.  UNSLAM adopts the present modified version of Stella VSLAM, based on version 0.5.0, commit **aa928c9**.  We are not upgrading to newer Stella VSLAM versions.  This sligthly modified version of Stella VSLAM is meant to be used in UNSLAM, but can be used as the original system.  If this is the only purpose, we recommend using Stella VSLAM newer versions.
 
-*Versions earlier than 0.3 are deprecated. If you use them, please use them as a derivative of ORB_SLAM2 under the GPL license.*
+The next title sumarizes the changes made to stella_vslam code in UNSLAM project.  The original Stella VSLAM documentation follows it.
+
+---
+
+## Changes to Stella VSLAM
+
+The code changes required to receive the image descriptor from the hybrid UNSLAM system are listed. The modified files are:
+
+- system.h: the private access specifier has been removed, so all attributes are public and available for debugging; not needed for use
+- system.cc: changes to feed_monocular_frame() to handle image descriptors
+- orb_extractor.cc: changes to extract() to recognize and unpack image descriptors.
+
+The hybrid system delivers an image descriptor to the Visual Slam system like an image - a matrix, through the same pipeline. The code modifications measure the width of the matrix: if it has up to 200 columns it is assumed to be an image descriptor and uses the new code to process it; if it has more than 200 columns it is assumed to be an image and follows the original pipeline.
+
+
 
 ---
 
