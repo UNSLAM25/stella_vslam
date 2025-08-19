@@ -30,6 +30,7 @@ class camera_database;
 class orb_params_database;
 class map_database;
 class bow_database;
+class frame_observation; // UNSLAM added
 } // namespace data
 
 namespace feature {
@@ -147,8 +148,8 @@ public:
     // /!\ UNSLAM25 TODO: Document this method
     //! Feed a monocular frame to SLAM system from ORB
     //! (NOTE: distorted images are acceptable if calibrated)
-    data::frame create_monocular_frame_from_orb(const cv::Mat& descriptors, const std::vector<cv::KeyPoint> &keypoints, const double timestamp);
-    std::shared_ptr<Mat44_t> feed_monocular_frame_from_orb(const cv::Mat& descriptors, const std::vector<cv::KeyPoint> &keypoints, const double timestamp);
+    data::frame create_monocular_frame_from_orb(const cv::Mat& descriptors, const std::vector<cv::KeyPoint>& keypoints, const double timestamp);
+    std::shared_ptr<Mat44_t> feed_monocular_frame_from_orb(const cv::Mat& descriptors, const std::vector<cv::KeyPoint>& keypoints, const double timestamp);
     //-----------------------------------------
     // pose initializing/updating
 
@@ -195,7 +196,15 @@ public:
     //! depthmap factor (pixel_value / depthmap_factor = true_depth)
     double depthmap_factor_ = 1.0;
 
-private:
+    //-----------------------------------------
+    // UNSLAM25
+    data::frame_observation* get_currentframe_observation() {
+        return &tracker_->curr_frame_.frm_obs_
+    }
+
+    // UNSLAM25, free access to attributes, for future analysis
+    // private:
+
     //! Check reset request of the system
     void check_reset_request();
 
